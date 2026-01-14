@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Conference Tool</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>Video Conference & Collaboration</h1>
+        <div class="connection-area">
+            <span id="myPeerId">Connecting...</span>
+            <input type="text" id="remotePeerId" placeholder="Enter peer ID">
+            <button id="connectBtn">Connect</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="video-section">
+            <div class="videos" id="videosGrid">
+                <div class="video-box">
+                    <video id="localVideo" autoplay muted playsinline></video>
+                    <span class="video-name">You</span>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button id="toggleVideo">Video Off</button>
+                <button id="toggleAudio">Mute</button>
+                <button id="shareScreen">Share Screen</button>
+                <button id="leaveCall" class="leave-btn">Leave Call</button>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="tabs">
+                <button class="tab active" data-tab="whiteboard">Whiteboard</button>
+                <button class="tab" data-tab="files">Files</button>
+            </div>
+
+            <div class="tab-content active" id="whiteboard-tab">
+                <div class="status-box" id="status">Waiting for connection...</div>
+                
+                <div class="canvas-wrapper">
+                    <canvas id="whiteboard"></canvas>
+                </div>
+                
+                <div class="tools">
+                    <label>Color:</label>
+                    <input type="color" id="colorPicker" value="#000000">
+                    
+                    <label>Size:</label>
+                    <input type="range" id="brushSize" min="1" max="20" value="3">
+                    
+                    <button id="clearCanvas">Clear Board</button>
+                </div>
+            </div>
+
+            <div class="tab-content" id="files-tab">
+                <input type="file" id="fileInput" style="display: none;">
+                <button id="selectFileBtn" class="upload-btn">Choose File to Share</button>
+                <ul id="fileList" class="file-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
