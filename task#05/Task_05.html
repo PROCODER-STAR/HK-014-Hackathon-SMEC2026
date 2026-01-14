@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>QR Session Chat</title>
+</head>
+<body>
+<h1>QR Session Chat</h1>
+
+<h2>Your Info</h2>
+Name: <input id="username" value="John Doe"><br>
+ID: <span id="userid"></span><br>
+
+<button onclick="showQR()">Show My QR</button>
+<div id="qrcode"></div>
+
+<hr>
+
+<button onclick="startScan()">Scan Friend QR</button>
+<div id="reader" style="width:300px;"></div>
+
+<hr>
+<h2>Connected Friends</h2>
+<ul id="friends"></ul>
+
+<hr>
+<h2>Chat</h2>
+<div id="chatWindow" style="height:200px;overflow:auto;border:1px solid #000;padding:5px;"></div>
+<input type="text" id="chatInput" placeholder="Type a message...">
+<button onclick="sendMessage()">Send</button>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<script>
+// --- User setup ---
+let currentUser = {
+    id: "USER_" + Math.floor(Math.random()*100000),
+    name: document.getElementById("username").value
+};
+document.getElementById("userid").textContent = currentUser.id;
+
+// --- Session friend list ---
+let friends = {}; // {id: {name}}
+let currentChat = null;
+
+// --- Show QR ---
+function showQR() {
+    currentUser.name = document.getElementById("username").value;
+    const qrDiv = document.getElementById("qrcode");
+    qrDiv.innerHTML = "";
+    new QRCode(qrDiv, {
+        text: JSON.stringify(currentUser),
+        width:200,
+        height:200
+    });
+}
+
+// --- Scan QR ---
+let scanner;
+function startScan() {
+    if (!scanner) scanner = new Html5Qrcode("reader");
+    scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        qrCodeMessage => {
+            try {
+                const friendData = JSON.parse(qrCodeMessage);
+                if (friendData.id === currentUser.id) return;
+                if (!friends[friendData.id]) {
+                    friends[friendData.id] = { name: friendData.name, messages: [] };
+                    updateFriends();
+                    alert("Friend Connected: " + friendData.name);
+                }
+            } catch(e) { console.log("Invalid QR"); }
+        },
+        error => {}
+    ).catch(err => alert("Camera access blocked: " + err));
+}
+
+// --- Update friend list ---
+function updateFriends() {
+    const list = document.getElementById("friends");
+    list.innerHTML = "";
+    for (let fid in friends) {
+        const li = document.createElement("li");
+        li.innerHTML = `${friends[fid].name} 
+                        <button onclick="selectFriend('${fid}')">Chat</button>`;
+        list.appendChild(li);
+    }
+}
+
+// --- Select friend to chat ---
+function selectFriend(fid) {
+    currentChat = fid;
+    const chatWindow = document.getElementById("chatWindow");
+    chatWindow.innerHTML = "";
+    friends[fid].messages.forEach(m=>{
+        displayMessage(m.sender, m.text);
+    });
+}
+
+// --- Send message ---
+function sendMessage() {
+    if(!currentChat) { alert("Select a friend first!"); return; }
+    const input = document.getElementById("chatInput");
+    const text = input.value.trim();
+    if(!text) return;
+    const msg = { sender: currentUser.name, text };
+    friends[currentChat].messages.push(msg);
+    displayMessage(msg.sender, msg.text);
+    input.value = "";
+}
+
+// --- Display message ---
+function displayMessage(sender, text) {
+    const chatWindow = document.getElementById("chatWindow");
+    const div = document.createElement("div");
+    div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    chatWindow.appendChild(div);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+</script>
+</body>
+</html>
