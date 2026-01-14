@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{% block title %}Social App{% endblock %}</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+	</head>
+	<body class="bg-white">
+		{% if messages %}
+		<div class="max-w-6xl mx-auto px-4 py-4">
+			{% for message in messages %}
+			<div
+				class="mb-4 p-3 rounded {% if message.tags %}bg-{{ message.tags }}-100 border border-{{ message.tags }}-400 text-{{ message.tags }}-700{% else %}bg-blue-100 border border-blue-400 text-blue-700{% endif %}">
+				{{ message }}
+			</div>
+			{% endfor %}
+		</div>
+		{% endif %} {% if user.is_authenticated %}
+		<nav class="bg-gray-100 border-b">
+			<div
+				class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+				<a href="{% url 'index' %}" class="text-xl font-bold">Social App</a>
+				<div class="flex space-x-4 items-center">
+					<a href="{% url 'index' %}">Home</a>
+					<span>{{ user.username }}</span>
+					<a href="{% url 'profile' %}">Profile</a>
+					<form
+						method="post"
+						action="{% url 'logout' %}"
+						style="display: inline">
+						{% csrf_token %}
+						<button
+							type="submit"
+							class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
+							Logout
+						</button>
+					</form>
+				</div>
+			</div>
+		</nav>
+		{% endif %} {% block content %}{% endblock %}
+	</body>
+</html>

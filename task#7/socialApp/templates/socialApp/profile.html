@@ -1,0 +1,83 @@
+{% extends 'socialApp/base.html' %} {% block title %}Profile - Social App{%endblock %} {% block content %}
+<div class="max-w-2xl mx-auto py-8 px-4">
+	<h1 class="text-3xl font-bold mb-6">User Profile</h1>
+
+	<div class="bg-white p-6 rounded border mb-6">
+		<div class="grid grid-cols-2 gap-6 mb-6">
+			<div>
+				<h3 class="text-sm font-medium text-gray-600">Username</h3>
+				<p class="text-lg mt-1">{{ user_profile.user.username }}</p>
+			</div>
+
+			<div>
+				<h3 class="text-sm font-medium text-gray-600">Email</h3>
+				<p class="text-lg mt-1">{{ user_profile.user.email }}</p>
+			</div>
+
+			<div>
+				<h3 class="text-sm font-medium text-gray-600">Followers</h3>
+				<p class="text-lg mt-1">{{ user_profile.followers_count }}</p>
+			</div>
+
+			<div>
+				<h3 class="text-sm font-medium text-gray-600">Following</h3>
+				<p class="text-lg mt-1">{{ user_profile.following_count }}</p>
+			</div>
+
+			<div>
+				<h3 class="text-sm font-medium text-gray-600">Member Since</h3>
+				<p class="text-lg mt-1">
+					{{ user_profile.user.date_joined|date:"F d, Y" }}
+				</p>
+			</div>
+		</div>
+
+		<div class="flex space-x-2">
+			<a
+				href="{% url 'index' %}"
+				class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+				Back to Feed
+			</a>
+			<a
+				href="{% url 'create_post' %}"
+				class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+				Create Post
+			</a>
+		</div>
+	</div>
+
+	{% if posts %}
+	<h2 class="text-2xl font-bold mb-4">Posts</h2>
+	<div class="space-y-6">
+		{% for post in posts %}
+		<div class="bg-white p-6 rounded border">
+			<div class="flex justify-between items-center mb-4">
+				<div>
+					<h3 class="font-bold">{{ post.owner.user.username }}</h3>
+					<p class="text-sm text-gray-600">
+						{{ post.created_at|date:"M d, Y H:i" }}
+					</p>
+				</div>
+				<a
+					href="{% url 'delete_post' post.id %}"
+					class="text-red-600 hover:text-red-800 text-sm"
+					>Delete</a
+				>
+			</div>
+
+			<p class="mb-4">{{ post.message }}</p>
+
+			<div class="flex space-x-4 text-sm">
+				<span class="text-gray-600">❤️ {{ post.likes_count }}</span>
+				<span class="text-gray-600">💬 {{ post.comments_count }}</span>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+	{% else %}
+	<div class="bg-white p-6 rounded border text-center">
+		<p class="text-gray-600">No posts yet. Create your first post!</p>
+	</div>
+	{% endif %}
+</div>
+{% endblock %}

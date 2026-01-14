@@ -1,0 +1,35 @@
+{% extends 'socialApp/base.html' %} {% block title %}Create Post - Social App{%endblock %} {% block content %}
+<div class="max-w-2xl mx-auto py-8 px-4">
+	<h1 class="text-3xl font-bold mb-6">Create a Post</h1>
+
+	<div class="bg-white p-6 rounded border">
+		<form method="post">
+			{% csrf_token %}
+			<div>
+				<label for="message" class="block text-sm font-medium mb-2"
+					>Message</label
+				>
+				<textarea
+					name="message"
+					id="message"
+					class="w-full px-3 py-2 border rounded"
+					rows="6"
+					placeholder="What's on your mind?"
+					required></textarea>
+			</div>
+			<div class="mt-4 flex space-x-2">
+				<button
+					type="submit"
+					class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+					Post
+				</button>
+				<a
+					href="{% url 'index' %}"
+					class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+					Cancel
+				</a>
+			</div>
+		</form>
+	</div>
+</div>
+{% endblock %}

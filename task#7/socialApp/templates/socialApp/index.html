@@ -1,0 +1,126 @@
+{% extends 'socialApp/base.html' %} {% block title %}Feed - Social App{%endblock %} {% block content %}
+<div class="max-w-2xl mx-auto py-8 px-4">
+	<h1 class="text-3xl font-bold mb-6">Social Feed</h1>
+
+	{% if user.is_authenticated %}
+	<div class="bg-white p-6 rounded border mb-6">
+		<h2 class="text-xl font-bold mb-4">Create a Post</h2>
+		<form method="post" action="{% url 'create_post' %}">
+			{% csrf_token %}
+			<textarea
+				name="message"
+				class="w-full px-3 py-2 border rounded"
+				rows="4"
+				placeholder="What's on your mind?"
+				required></textarea>
+			<button
+				type="submit"
+				class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+				Post
+			</button>
+		</form>
+	</div>
+
+	<div class="space-y-6">
+		{% for post in posts %}
+		<div class="bg-white p-6 rounded border">
+			<div class="flex justify-between items-center mb-4">
+				<div>
+					<h3 class="font-bold">{{ post.owner.user.username }}</h3>
+					<p class="text-sm text-gray-600">
+						{{ post.created_at|date:"M d, Y H:i" }}
+					</p>
+				</div>
+				{% if post.owner.user == user %}
+				<a
+					href="{% url 'delete_post' post.id %}"
+					class="text-red-600 hover:text-red-800 text-sm"
+					>Delete</a
+				>
+				{% endif %}
+			</div>
+
+			<p class="mb-4">{{ post.message }}</p>
+
+			<div class="flex space-x-4 text-sm mb-4">
+				<form
+					method="post"
+					action="{% url 'toggle_like' post.id %}"
+					style="display: inline">
+					{% csrf_token %}
+					<button type="submit" class="text-gray-600 hover:text-blue-600">
+						{% if user in post.likes.values_list %}
+						<span>❤️ {{ post.likes_count }}</span>
+						{% else %}
+						<span>🤍 {{ post.likes_count }}</span>
+						{% endif %}
+					</button>
+				</form>
+				<span class="text-gray-600">💬 {{ post.comments_count }}</span>
+			</div>
+
+			<div class="border-t pt-4">
+				<h4 class="font-bold text-sm mb-2">Comments</h4>
+				<div class="space-y-2 mb-4 max-h-48 overflow-y-auto">
+					{% for comment in post.comments.all %}
+					<div class="text-sm bg-gray-50 p-2 rounded">
+						<div class="flex justify-between">
+							<strong>{{ comment.made_by.user.username }}</strong>
+							{% if comment.made_by.user == user %}
+							<a
+								href="{% url 'delete_comment' comment.id %}"
+								class="text-red-600 hover:text-red-800 text-xs"
+								>Delete</a
+							>
+							{% endif %}
+						</div>
+						<p>{{ comment.message }}</p>
+						<p class="text-xs text-gray-600">
+							{{ comment.created_at|date:"M d, Y H:i" }}
+						</p>
+					</div>
+					{% empty %}
+					<p class="text-gray-600 text-sm">No comments yet.</p>
+					{% endfor %}
+				</div>
+
+				<form method="post" action="{% url 'create_comment' post.id %}">
+					{% csrf_token %}
+					<input
+						type="text"
+						name="message"
+						class="w-full px-3 py-2 border rounded text-sm"
+						placeholder="Add a comment..." />
+					<button
+						type="submit"
+						class="mt-2 bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700">
+						Comment
+					</button>
+				</form>
+			</div>
+		</div>
+		{% empty %}
+		<div class="bg-white p-6 rounded border text-center">
+			<p class="text-gray-600">No posts yet. Be the first to post!</p>
+		</div>
+		{% endfor %}
+	</div>
+	{% else %}
+	<div class="bg-white p-6 rounded border text-center">
+		<p class="text-gray-600 mb-4">Please log in to see the feed.</p>
+		<div class="space-x-4">
+			<a
+				href="{% url 'login' %}"
+				class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+				Login
+			</a>
+			<a
+				href="{% url 'signup' %}"
+				class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+				Sign Up
+			</a>
+		</div>
+	</div>
+	{% endif %}
+</div>
+{% endblock %}
